@@ -1,14 +1,18 @@
-﻿using System.Runtime.CompilerServices;
+﻿
+
+using System.Runtime.CompilerServices;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        byte num1 = byte.MaxValue;
+        byte num2 = 25;
+        Console.WriteLine(checked((byte)(num1 + num2)));
     }
 }
 
-namespace Emulator
+namespace GBEmulator
 {
     public struct Register
     {
@@ -17,11 +21,11 @@ namespace Emulator
         public byte c;
         public byte d;
         public byte e;
-        public FlagsRegister f;
+        public FlagRegister f;
         public byte h;
         public byte l;
     }
-    public struct FlagsRegister
+    public struct FlagRegister
     {
         public const byte zero_flag_position = 7;
         public const byte subtract_flag_position = 6;
@@ -33,22 +37,22 @@ namespace Emulator
         public bool half_carry;
         public bool carry;
     }
-    public static class RegisterOperations
+    public static class RegisterExtensions
     {
-        //FlagsRegister: leaves out the unused 4 bits of the register
-        public static byte As_byte(this FlagsRegister flags)
+        //Enabling the Flagsregister to be used as a byte
+        public static byte As_byte(this FlagRegister flags)
         {
-            return (byte)((flags.zero ? 1 : 0 << FlagsRegister.zero_flag_position) |
-                          (flags.subtract ? 1 : 0 << FlagsRegister.subtract_flag_position) |
-                          (flags.half_carry ? 1 : 0 << FlagsRegister.half_carry_flag_position) |
-                          (flags.carry ? 1 : 0 << FlagsRegister.carry_flag_position));
+            return (byte)((flags.zero ? 1 : 0 << FlagRegister.zero_flag_position) |
+                          (flags.subtract ? 1 : 0 << FlagRegister.subtract_flag_position) |
+                          (flags.half_carry ? 1 : 0 << FlagRegister.half_carry_flag_position) |
+                          (flags.carry ? 1 : 0 << FlagRegister.carry_flag_position));
         }
-        public static void From_byte(this FlagsRegister flags, byte value)
+        public static void From_byte(this FlagRegister flags, byte value)
         {
-            flags.zero = (value >> FlagsRegister.zero_flag_position & 0x1) == 1;
-            flags.subtract = (value >> FlagsRegister.subtract_flag_position & 0x1) == 1;
-            flags.half_carry = (value >> FlagsRegister.half_carry_flag_position & 0x1) == 1;
-            flags.carry = (value >> FlagsRegister.carry_flag_position & 0x1) == 1;
+            flags.zero = (value >> FlagRegister.zero_flag_position & 0x1) == 1;
+            flags.subtract = (value >> FlagRegister.subtract_flag_position & 0x1) == 1;
+            flags.half_carry = (value >> FlagRegister.half_carry_flag_position & 0x1) == 1;
+            flags.carry = (value >> FlagRegister.carry_flag_position & 0x1) == 1;
         }
 
         //virtual registers: treat 2 seperate 8 bit registers as one 16 bit
@@ -88,6 +92,52 @@ namespace Emulator
         {
             register.h = (byte)((value & 0xff00) >> 8);
             register.l = (byte)(value & 0xff);
+        }
+    }
+    public class CPU
+    {
+        public Register registers;
+
+        public ushort pc = 0x100;
+        public byte[] memory = new byte[0xFFFF];
+
+        public ushort sp = 0xFFFE;
+    }
+    public static class Instructions
+    {
+        public static ushort ExecuteInstruction(this CPU CPU, ushort pc)
+        {
+            switch (CPU.memory[pc])
+            {
+                default: Console.WriteLine("undefined or empty opcode"); return 0x0000;
+            }
+        }
+
+        //stack operations
+        public static void Push(this CPU CPU, byte value)
+        {
+
+        }
+        public static void Call(this CPU CPU, byte value)
+        {
+
+        }
+        public static void Rst(this CPU CPU, byte value)
+        {
+
+        }
+
+        public static byte Pop(this CPU CPU)
+        {
+            return 0x00;
+        }
+        public static byte Ret(this CPU CPU)
+        {
+            return 0x00;
+        }
+        public static byte Reti(this CPU CPU)
+        {
+            return 0x00;
         }
     }
 }
