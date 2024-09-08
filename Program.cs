@@ -122,7 +122,7 @@ namespace GBEmulator
         public static byte ReadByte(this CPU cpu, bool readNext = false)
         {
             if (readNext) cpu.pc++;
-            return cpu.memory[cpu.pc++];
+            return cpu.memory[cpu.pc];
         }
         public static ushort ReadShortAt(this CPU cpu, ushort index)
         { 
@@ -131,7 +131,7 @@ namespace GBEmulator
         public static ushort ReadUshort(this CPU cpu, bool readNext = false)
         {
             if (readNext) cpu.pc++;
-            return (ushort)((cpu.memory[cpu.pc++] << 8 | cpu.memory[cpu.pc++]));
+            return (ushort)((cpu.memory[cpu.pc] << 8 | cpu.memory[cpu.pc]));
         }
 
         public static void WriteAt(this CPU cpu, ushort index, byte value)
@@ -220,41 +220,58 @@ namespace GBEmulator
                 case 0x74: cpu.WriteAt(cpu.registers.hl, cpu.registers.h); cpu.pc++; break;
                 case 0x75: cpu.WriteAt(cpu.registers.hl, cpu.registers.l); cpu.pc++; break;
 
-                case 0x36: cpu.registers.hl = cpu.ReadByte(true); break;
+                case 0x36: cpu.WriteAt(cpu.registers.hl,cpu.ReadByte(true)); cpu.pc++; break;
 
                 //LD A,n
-                case 0x0A: cpu.registers.a = (byte)(cpu.registers.bc >> 8); cpu.pc++; break;
-                case 0x1A: cpu.registers.a = (byte)
+                case 0x0A: cpu.registers.a = cpu.ReadAt(cpu.registers.bc); cpu.pc++; break;
+                case 0x1A: cpu.registers.a = cpu.ReadAt(cpu.registers.de); cpu.pc++; break;
+                case 0xFA: cpu.registers.a = cpu.ReadAt(cpu.ReadUshort(true)); cpu.pc += 2; break;
+                case 0x3E: cpu.registers.a = cpu.ReadByte(true); cpu.pc++; break;
 
-                default: Console.WriteLine("undefined or empty opcode"); cpu.pc++; break;
+                //LD n,A
+                case 0x47: cpu.registers.b = cpu.registers.a; cpu.pc++; break;
+                case 0x4F: cpu.registers.c = cpu.registers.a; cpu.pc++; break;
+                case 0x57: cpu.registers.d = cpu.registers.a; cpu.pc++; break;
+                case 0x5F: cpu.registers.e = cpu.registers.a; cpu.pc++; break;
+                case 0x67: cpu.registers.h = cpu.registers.a; cpu.pc++; break;
+                case 0x6F: cpu.registers.l = cpu.registers.a; cpu.pc++; break;
+                case 0x02: cpu.WriteAt(cpu.registers.bc, cpu.registers.a); cpu.pc++; break;
+                case 0x12: cpu.WriteAt(cpu.registers.de, cpu.registers.a); cpu.pc++; break;
+                case 0x77: cpu.WriteAt(cpu.registers.hl, cpu.registers.a); cpu.pc++; break;
+                case 0xEA: cpu.WriteAt(cpu.ReadUshort(true), cpu.registers.a); cpu.pc += 2; break;
+
+                
+                case 0xF2: cpu.registers.a = cpu.ReadAt((ushort)(0xFF00 + cpu.registers.c)); cpu.pc++;  break;//LD A,(C) put value at address 0xFF00 + C into A                
+                case 0xE2: cpu.WriteAt((ushort)(0xFF00 + cpu.registers.c), cpu.registers.a); cpu.pc++;  break;//LD (C), A put A into 0xFF00 + C                
+                case 0x3A: cpu.registers.a = cpu.ReadAt(cpu.registers.hl--); cpu.pc++;                  break;//LDD A,(HL) the command has two alternate forms, check datasheet for them                
+                case 0x2A: cpu.registers.a = cpu.ReadAt(cpu.registers.hl++); cpu.pc++;                  break;//LDI A,(HL) the command has two alternate forms, check datasheet for them                
+                case 0x22: cpu.WriteAt(cpu.registers.hl++, cpu.registers.a); cpu.pc++;                  break;//LDI (HL),A
+                case 0xE0: cpu.WriteAt((byte)(0xFF00 + cpu.ReadByte(true)), cpu.registers.a);           break;//LDH (n),A
+                case 0xF0: cpu.registers.a = cpu.ReadAt((byte)(0xFF00 + cpu.ReadByte(true))); cpu.pc++; break;//LDH A,(n)
+
+                //16-bit Loads
+                //LD n,nn
+                case 0x01: cpu.registers.bc = cpu.ReadUshort(true); cpu.pc += 2; break;
+                case 0x11: cpu.registers.de = cpu.ReadUshort(true); cpu.pc += 2; break;
+                case 0x21: cpu.registers.hl = cpu.ReadUshort(true); cpu.pc += 2; break;
+                case 0x31: cpu.sp = cpu.ReadUshort(true); cpu.pc += 2;           break;
+
+                case 0xF9: cpu.sp = cpu.registers.hl; cpu.pc++; break;//LD SP,HL
+                case 0xF8:
+                    {
+                        cpu.sp = cpu.ReadAt((byte)(cpu.sp + (sbyte)cpu.ReadByte(true)));
+                        cpu.registers.f.zero = false;
+                        cpu.registers.f.subtract = false;
+                    } break;
+
+                default: Console.WriteLine("undefined or empty opcode"); cpu.pc++; 
+                         throw new NotImplementedException("the opcode was either not implemented of flawed");
             }
         }
 
-        //stack operations
-        public static void Push(this CPU CPU, byte value)
+        static ushort Combine(byte a, byte b)
         {
-
-        }
-        public static void Call(this CPU CPU, byte value)
-        {
-
-        }
-        public static void Rst(this CPU CPU, byte value)
-        {
-
-        }
-
-        public static byte Pop(this CPU CPU)
-        {
-            return 0x00;
-        }
-        public static byte Ret(this CPU CPU)
-        {
-            return 0x00;
-        }
-        public static byte Reti(this CPU CPU)
-        {
-            return 0x00;
+            return (ushort)((a << 8) | b);
         }
     }
 }
