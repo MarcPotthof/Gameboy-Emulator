@@ -394,6 +394,19 @@ namespace GBEmulator
                 case 0x2D: cpu.registers.l = DEC(cpu.registers.l); cpu.pc++; break;
                 case 0x35: cpu.WriteAt(cpu.registers.hl, DEC(cpu.ReadAt(cpu.registers.hl))); cpu.pc++; break;
 
+                //16-bit ALU
+                //ADD HL, n
+                case 0x09: cpu.registers.hl = ADDUShort(cpu.registers.hl,cpu.registers.bc); cpu.pc++; break;
+                case 0x19: cpu.registers.hl = ADDUShort(cpu.registers.hl,cpu.registers.de); cpu.pc++; break;
+                case 0x29: cpu.registers.hl = ADDUShort(cpu.registers.hl,cpu.registers.hl); cpu.pc++; break;
+                case 0x39: cpu.registers.hl = ADDUShort(cpu.registers.hl,cpu.sp);           cpu.pc++; break;
+
+                //ADD SP, n
+                case 0xE8: cpu.sp = ADDUShort(cpu.sp, cpu.ReadByte(true)); cpu.pc++; break;
+
+
+
+
                 default:
                     Console.WriteLine("undefined or empty opcode"); cpu.pc++;
                     throw new NotImplementedException("the opcode was either not implemented of flawed");
@@ -439,6 +452,16 @@ namespace GBEmulator
                 SetFlagH(cpu.registers.a, b);
                 SetFlagC(result);
                 cpu.registers.a = (byte)result;
+            }
+            ushort ADDUShort(ushort a, ushort b)
+            {
+                int result = a + b + (cpu.registers.f.carry ? 1 : 0);
+                cpu.registers.f.subtract = false;
+                SetFlagZ(result);
+                cpu.registers.f.half_carry = (a & 0x0FFF) < (b & 0x0FFF);
+                cpu.registers.f.carry = (result >> 16) != 0;
+                SetFlagC(result);
+                return (ushort)result;
             }
             void ADC(byte b)
             {
