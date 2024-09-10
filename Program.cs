@@ -269,8 +269,11 @@ namespace GBEmulator
                         SetFlagH((byte)cpu.sp, (byte)cpu.ReadByte());
                         cpu.registers.hl = cpu.ReadAt((byte)(cpu.sp + (sbyte)cpu.ReadByte(true)));
                     } break;
-                case 0x08: cpu.WriteAt(cpu.ReadUshort(true), (byte)(cpu.sp >> 8));
-                           cpu.WriteAt((byte)(cpu.ReadUshort() + 1), (byte)(cpu.sp & 0xff)); break;//LD (nn), SP
+                case 0x08:
+                    {
+                        cpu.WriteAt(cpu.ReadUshort(true), (byte)(cpu.sp >> 8));
+                        cpu.WriteAt((byte)(cpu.ReadUshort() + 1), (byte)(cpu.sp & 0xff));
+                    } break;//LD (nn), SP
 
                 //PUSH nn
                 case 0xF5: Push(cpu.registers.af); cpu.pc++; break;
@@ -318,7 +321,78 @@ namespace GBEmulator
                 case 0xD6: SUB(cpu.ReadByte(true)) ; cpu.pc++; break;
 
                 //SBC A,n
+                case 0x9F: SBC(cpu.registers.a); cpu.pc++; break;
+                case 0x98: SBC(cpu.registers.b); cpu.pc++; break;
+                case 0x99: SBC(cpu.registers.c); cpu.pc++; break;
+                case 0x9A: SBC(cpu.registers.d); cpu.pc++; break;
+                case 0x9B: SBC(cpu.registers.e); cpu.pc++; break;
+                case 0x9C: SBC(cpu.registers.h); cpu.pc++; break;
+                case 0x9D: SBC(cpu.registers.l); cpu.pc++; break;
+                case 0x9E: SBC(cpu.ReadAt(cpu.registers.hl)) ; cpu.pc++; break;
+                
+                //AND n
+                case 0xA7: AND(cpu.registers.a); cpu.pc++; break;
+                case 0xA0: AND(cpu.registers.b); cpu.pc++; break;
+                case 0xA1: AND(cpu.registers.c); cpu.pc++; break;
+                case 0xA2: AND(cpu.registers.d); cpu.pc++; break;
+                case 0xA3: AND(cpu.registers.e); cpu.pc++; break;
+                case 0xA4: AND(cpu.registers.h); cpu.pc++; break;
+                case 0xA5: AND(cpu.registers.l); cpu.pc++; break;
+                case 0xA6: AND(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xE6: AND(cpu.ReadByte(true)); cpu.pc++; break;
 
+                //OR n
+                case 0xB7: OR(cpu.registers.a); cpu.pc++; break;
+                case 0xB0: OR(cpu.registers.b); cpu.pc++; break;
+                case 0xB1: OR(cpu.registers.c); cpu.pc++; break;
+                case 0xB2: OR(cpu.registers.d); cpu.pc++; break;
+                case 0xB3: OR(cpu.registers.e); cpu.pc++; break;
+                case 0xB4: OR(cpu.registers.h); cpu.pc++; break;
+                case 0xB5: OR(cpu.registers.l); cpu.pc++; break;
+                case 0xB6: OR(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xF6: OR(cpu.ReadByte(true)); cpu.pc++; break;
+
+                //XOR n
+                case 0xAF: XOR(cpu.registers.a); cpu.pc++; break;
+                case 0xA8: XOR(cpu.registers.b); cpu.pc++; break;
+                case 0xA9: XOR(cpu.registers.c); cpu.pc++; break;
+                case 0xAA: XOR(cpu.registers.d); cpu.pc++; break;
+                case 0xAB: XOR(cpu.registers.e); cpu.pc++; break;
+                case 0xAC: XOR(cpu.registers.h); cpu.pc++; break;
+                case 0xAD: XOR(cpu.registers.l); cpu.pc++; break;
+                case 0xAE: XOR(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xEE: XOR(cpu.ReadByte(true)); cpu.pc++; break;
+
+                //CP n
+                case 0xBF: CP(cpu.registers.a); cpu.pc++; break;
+                case 0xB8: CP(cpu.registers.b); cpu.pc++; break;
+                case 0xB9: CP(cpu.registers.c); cpu.pc++; break;
+                case 0xBA: CP(cpu.registers.d); cpu.pc++; break;
+                case 0xBB: CP(cpu.registers.e); cpu.pc++; break;
+                case 0xBC: CP(cpu.registers.h); cpu.pc++; break;
+                case 0xBD: CP(cpu.registers.l); cpu.pc++; break;
+                case 0xBE: CP(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xFE: CP(cpu.ReadByte(true)); cpu.pc++; break;
+
+                //INC n
+                case 0x3C: cpu.registers.a = INC(cpu.registers.a ); cpu.pc++; break;
+                case 0x04: cpu.registers.b = INC(cpu.registers.b ); cpu.pc++; break;
+                case 0x0C: cpu.registers.c = INC(cpu.registers.c ); cpu.pc++; break;
+                case 0x14: cpu.registers.d = INC(cpu.registers.d ); cpu.pc++; break;
+                case 0x1C: cpu.registers.e = INC(cpu.registers.e ); cpu.pc++; break;
+                case 0x24: cpu.registers.h = INC(cpu.registers.h ); cpu.pc++; break;
+                case 0x2C: cpu.registers.l = INC(cpu.registers.l ); cpu.pc++; break;
+                case 0x34: cpu.WriteAt(cpu.registers.hl, INC(cpu.ReadAt(cpu.registers.hl))); cpu.pc++; break;
+
+                //DEC n
+                case 0x3D: cpu.registers.a = DEC(cpu.registers.a); cpu.pc++; break;
+                case 0x05: cpu.registers.b = DEC(cpu.registers.b); cpu.pc++; break;
+                case 0x0D: cpu.registers.c = DEC(cpu.registers.c); cpu.pc++; break;
+                case 0x15: cpu.registers.d = DEC(cpu.registers.d); cpu.pc++; break;
+                case 0x1D: cpu.registers.e = DEC(cpu.registers.e); cpu.pc++; break;
+                case 0x25: cpu.registers.h = DEC(cpu.registers.h); cpu.pc++; break;
+                case 0x2D: cpu.registers.l = DEC(cpu.registers.l); cpu.pc++; break;
+                case 0x35: cpu.WriteAt(cpu.registers.hl, DEC(cpu.ReadAt(cpu.registers.hl))); cpu.pc++; break;
 
                 default:
                     Console.WriteLine("undefined or empty opcode"); cpu.pc++;
@@ -381,7 +455,7 @@ namespace GBEmulator
                 cpu.registers.f.subtract = true;
                 SetFlagZ(result);
                 SetFlagHSubstract(cpu.registers.a, b);
-                cpu.registers.f.subtract = true;
+                SetFlagC(result);
                 cpu.registers.a = (byte)result;
             }
             void SBC(byte b)
@@ -392,6 +466,54 @@ namespace GBEmulator
                 SetFlagHSubstract(cpu.registers.a, b);
                 SetFlagC(b);
                 cpu.registers.a = (byte)result;
+            }
+            void AND(byte b)
+            {
+                cpu.registers.a = (byte)(cpu.registers.a & b);
+                SetFlagZ(cpu.registers.a);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = true;
+                cpu.registers.f.carry = false;
+            }
+            void OR(byte b)
+            {
+                cpu.registers.a = (byte)(cpu.registers.a | b);
+                SetFlagZ(cpu.registers.a);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = false;
+            }
+            void XOR(byte b)
+            {
+                cpu.registers.a = (byte)(cpu.registers.a ^ b);
+                SetFlagZ(cpu.registers.a);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = false;
+            }
+            void CP(byte b)
+            {
+                int result = cpu.registers.a - b;
+                cpu.registers.f.subtract = true;
+                SetFlagZ(result);
+                SetFlagHSubstract(cpu.registers.a, b);
+                SetFlagC(result);
+            }
+            byte INC(byte b)
+            {
+                byte result = (byte)(b + 1);
+                SetFlagZ(result);
+                SetFlagH(b, 1);
+                cpu.registers.f.subtract = false;
+                return result;
+            }
+            byte DEC(byte b)
+            {
+                byte result = (byte)(b - 1);
+                SetFlagZ(result);
+                SetFlagHSubstract(b, 1);
+                cpu.registers.f.subtract = true;
+                return result;
             }
         }
     }
