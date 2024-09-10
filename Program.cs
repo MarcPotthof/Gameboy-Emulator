@@ -26,9 +26,9 @@ namespace GBEmulator
         public byte h;
         public byte l;
 
-        public ushort af { get { return (UInt16)((a << 8) | f.As_byte()); } set {a = (byte)((value & 0xff00) >> 8);f.From_byte((byte)(value & 0xff));} }
-        public ushort bc { get { return (UInt16)((b << 8) | c); } set { b = (byte)((value & 0xff00) >> 8);c = (byte)(value & 0xff);} }
-        public ushort de { get { return (UInt16)((d << 8) | e); } set { d = (byte)((value & 0xff00) >> 8);e = (byte)(value & 0xff);} }
+        public ushort af { get { return (UInt16)((a << 8) | f.As_byte()); } set { a = (byte)((value & 0xff00) >> 8); f.From_byte((byte)(value & 0xff)); } }
+        public ushort bc { get { return (UInt16)((b << 8) | c); } set { b = (byte)((value & 0xff00) >> 8); c = (byte)(value & 0xff); } }
+        public ushort de { get { return (UInt16)((d << 8) | e); } set { d = (byte)((value & 0xff00) >> 8); e = (byte)(value & 0xff); } }
         public ushort hl { get { return (UInt16)((h << 8) | l); } set { h = (byte)((value & 0xff00) >> 8); l = (byte)(value & 0xff); } }
     }
     public struct FlagRegister
@@ -117,7 +117,7 @@ namespace GBEmulator
     {
         public static byte ReadAt(this CPU cpu, ushort index)
         {
-            return cpu.memory[index]; 
+            return cpu.memory[index];
         }
         public static byte ReadByte(this CPU cpu, bool readNext = false)
         {
@@ -125,7 +125,7 @@ namespace GBEmulator
             return cpu.memory[cpu.pc];
         }
         public static ushort ReadShortAt(this CPU cpu, ushort index)
-        { 
+        {
             return (ushort)((cpu.memory[index] << 8 | cpu.memory[index + 1]));
         }
         public static ushort ReadUshort(this CPU cpu, bool readNext = false)
@@ -136,12 +136,17 @@ namespace GBEmulator
 
         public static void WriteAt(this CPU cpu, ushort index, byte value)
         {
-
+            cpu.memory[index] = value;
+        }
+        public static void WriteShortAt(this CPU cpu, ushort index, ushort value)
+        {
+            cpu.memory[index] = (byte)(value >> 8);
+            cpu.memory[index + 1] = (byte)(value & 0xFF);
         }
 
         public static void ExecuteInstruction(this CPU cpu)
         {
-            switch (cpu.memory[cpu.pc]) 
+            switch (cpu.memory[cpu.pc])
             {
                 //Instruction list:
                 //http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
@@ -220,7 +225,7 @@ namespace GBEmulator
                 case 0x74: cpu.WriteAt(cpu.registers.hl, cpu.registers.h); cpu.pc++; break;
                 case 0x75: cpu.WriteAt(cpu.registers.hl, cpu.registers.l); cpu.pc++; break;
 
-                case 0x36: cpu.WriteAt(cpu.registers.hl,cpu.ReadByte(true)); cpu.pc++; break;
+                case 0x36: cpu.WriteAt(cpu.registers.hl, cpu.ReadByte(true)); cpu.pc++; break;
 
                 //LD A,n
                 case 0x0A: cpu.registers.a = cpu.ReadAt(cpu.registers.bc); cpu.pc++; break;
@@ -240,13 +245,13 @@ namespace GBEmulator
                 case 0x77: cpu.WriteAt(cpu.registers.hl, cpu.registers.a); cpu.pc++; break;
                 case 0xEA: cpu.WriteAt(cpu.ReadUshort(true), cpu.registers.a); cpu.pc += 2; break;
 
-                
-                case 0xF2: cpu.registers.a = cpu.ReadAt((ushort)(0xFF00 + cpu.registers.c)); cpu.pc++;  break;//LD A,(C) put value at address 0xFF00 + C into A                
-                case 0xE2: cpu.WriteAt((ushort)(0xFF00 + cpu.registers.c), cpu.registers.a); cpu.pc++;  break;//LD (C), A put A into 0xFF00 + C                
-                case 0x3A: cpu.registers.a = cpu.ReadAt(cpu.registers.hl--); cpu.pc++;                  break;//LDD A,(HL) the command has two alternate forms, check datasheet for them                
-                case 0x2A: cpu.registers.a = cpu.ReadAt(cpu.registers.hl++); cpu.pc++;                  break;//LDI A,(HL) the command has two alternate forms, check datasheet for them                
-                case 0x22: cpu.WriteAt(cpu.registers.hl++, cpu.registers.a); cpu.pc++;                  break;//LDI (HL),A
-                case 0xE0: cpu.WriteAt((byte)(0xFF00 + cpu.ReadByte(true)), cpu.registers.a);           break;//LDH (n),A
+
+                case 0xF2: cpu.registers.a = cpu.ReadAt((ushort)(0xFF00 + cpu.registers.c)); cpu.pc++; break;//LD A,(C) put value at address 0xFF00 + C into A                
+                case 0xE2: cpu.WriteAt((ushort)(0xFF00 + cpu.registers.c), cpu.registers.a); cpu.pc++; break;//LD (C), A put A into 0xFF00 + C                
+                case 0x3A: cpu.registers.a = cpu.ReadAt(cpu.registers.hl--); cpu.pc++; break;//LDD A,(HL) the command has two alternate forms, check datasheet for them                
+                case 0x2A: cpu.registers.a = cpu.ReadAt(cpu.registers.hl++); cpu.pc++; break;//LDI A,(HL) the command has two alternate forms, check datasheet for them                
+                case 0x22: cpu.WriteAt(cpu.registers.hl++, cpu.registers.a); cpu.pc++; break;//LDI (HL),A
+                case 0xE0: cpu.WriteAt((byte)(0xFF00 + cpu.ReadByte(true)), cpu.registers.a); break;//LDH (n),A
                 case 0xF0: cpu.registers.a = cpu.ReadAt((byte)(0xFF00 + cpu.ReadByte(true))); cpu.pc++; break;//LDH A,(n)
 
                 //16-bit Loads
@@ -254,24 +259,140 @@ namespace GBEmulator
                 case 0x01: cpu.registers.bc = cpu.ReadUshort(true); cpu.pc += 2; break;
                 case 0x11: cpu.registers.de = cpu.ReadUshort(true); cpu.pc += 2; break;
                 case 0x21: cpu.registers.hl = cpu.ReadUshort(true); cpu.pc += 2; break;
-                case 0x31: cpu.sp = cpu.ReadUshort(true); cpu.pc += 2;           break;
+                case 0x31: cpu.sp = cpu.ReadUshort(true); cpu.pc += 2; break;
 
                 case 0xF9: cpu.sp = cpu.registers.hl; cpu.pc++; break;//LD SP,HL
-                case 0xF8:
-                    {
-                        cpu.sp = cpu.ReadAt((byte)(cpu.sp + (sbyte)cpu.ReadByte(true)));
+                case 0xF8: {
                         cpu.registers.f.zero = false;
                         cpu.registers.f.subtract = false;
+                        SetFlagC(cpu.sp + (sbyte)cpu.ReadByte());
+                        SetFlagH((byte)cpu.sp, (byte)cpu.ReadByte());
+                        cpu.registers.hl = cpu.ReadAt((byte)(cpu.sp + (sbyte)cpu.ReadByte(true)));
                     } break;
+                case 0x08: cpu.WriteAt(cpu.ReadUshort(true), (byte)(cpu.sp >> 8));
+                           cpu.WriteAt((byte)(cpu.ReadUshort() + 1), (byte)(cpu.sp & 0xff)); break;//LD (nn), SP
 
-                default: Console.WriteLine("undefined or empty opcode"); cpu.pc++; 
-                         throw new NotImplementedException("the opcode was either not implemented of flawed");
+                //PUSH nn
+                case 0xF5: Push(cpu.registers.af); cpu.pc++; break;
+                case 0xC5: Push(cpu.registers.bc); cpu.pc++; break;
+                case 0xD5: Push(cpu.registers.de); cpu.pc++; break;
+                case 0xE5: Push(cpu.registers.hl); cpu.pc++; break;
+                //POP nn
+                case 0xF1: cpu.registers.af = Pop(); cpu.pc++; break;
+                case 0xC1: cpu.registers.bc = Pop(); cpu.pc++; break;
+                case 0xD1: cpu.registers.de = Pop(); cpu.pc++; break;
+                case 0xE1: cpu.registers.hl = Pop(); cpu.pc++; break;
+
+                //8-bit ALU
+                //Add A,n
+                case 0x87: ADD(cpu.registers.a); cpu.pc++; break;
+                case 0x80: ADD(cpu.registers.b); cpu.pc++; break;
+                case 0x81: ADD(cpu.registers.c); cpu.pc++; break;
+                case 0x82: ADD(cpu.registers.d); cpu.pc++; break;
+                case 0x83: ADD(cpu.registers.e); cpu.pc++; break;
+                case 0x84: ADD(cpu.registers.h); cpu.pc++; break;
+                case 0x85: ADD(cpu.registers.l); cpu.pc++; break;
+                case 0x86: ADD(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xC6: ADD(cpu.ReadByte(true)); cpu.pc++; break;
+
+                //ADC A,n
+                case 0x8F: ADC(cpu.registers.a); cpu.pc++; break;
+                case 0x88: ADC(cpu.registers.b); cpu.pc++; break;
+                case 0x89: ADC(cpu.registers.c); cpu.pc++; break;
+                case 0x8A: ADC(cpu.registers.d); cpu.pc++; break;
+                case 0x8B: ADC(cpu.registers.e); cpu.pc++; break;
+                case 0x8C: ADC(cpu.registers.h); cpu.pc++; break;
+                case 0x8D: ADC(cpu.registers.l); cpu.pc++; break;
+                case 0x8E: ADC(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xCE: ADC(cpu.ReadByte(true)); cpu.pc++; break;
+
+                //SUB n
+                case 0x97: SUB(cpu.registers.a); cpu.pc++; break;
+                case 0x90: SUB(cpu.registers.b); cpu.pc++; break;
+                case 0x91: SUB(cpu.registers.c); cpu.pc++; break;
+                case 0x92: SUB(cpu.registers.d); cpu.pc++; break;
+                case 0x93: SUB(cpu.registers.e); cpu.pc++; break;
+                case 0x94: SUB(cpu.registers.h); cpu.pc++; break;
+                case 0x95: SUB(cpu.registers.l); cpu.pc++; break;
+                case 0x96: SUB(cpu.ReadAt(cpu.registers.hl)); cpu.pc++; break;
+                case 0xD6: SUB(cpu.ReadByte(true)) ; cpu.pc++; break;
+
+                //SBC A,n
+
+
+                default:
+                    Console.WriteLine("undefined or empty opcode"); cpu.pc++;
+                    throw new NotImplementedException("the opcode was either not implemented of flawed");
             }
-        }
+            static ushort Combine(byte a, byte b)
+            {
+                return (ushort)((a << 8) | b);
+            }
+            void SetFlagC(int i)
+            {
+                cpu.registers.f.carry = (i >> 8) != 0;
+            }
+            void SetFlagH(byte b1, byte b2)
+            {
+                cpu.registers.f.half_carry = ((b1 & 0xF) + (b2 & 0xF)) > 0xF;
 
-        static ushort Combine(byte a, byte b)
-        {
-            return (ushort)((a << 8) | b);
+            }
+            void SetFlagZ(int value)
+            {
+                cpu.registers.f.zero = value == 0;
+            }
+            void SetFlagHSubstract(byte b1, byte b2)
+            {
+                cpu.registers.f.half_carry = (b1 & 0xF) < (b2 & 0xF);
+            }
+                
+            void Push(ushort register)
+            {
+                cpu.WriteShortAt(--cpu.sp, register); cpu.sp--;
+            }
+            ushort Pop()
+            {
+                ushort result = cpu.ReadShortAt((byte)(cpu.sp + 1));
+                cpu.WriteAt(++cpu.sp, 0x00);
+                cpu.WriteAt(++cpu.sp, 0x00);
+                return result;
+            }
+            void ADD(byte b)
+            {
+                int result = cpu.registers.a + b + (cpu.registers.f.carry ? 1 : 0);
+                cpu.registers.f.subtract = false;
+                SetFlagZ(result);
+                SetFlagH(cpu.registers.a, b);
+                SetFlagC(result);
+                cpu.registers.a = (byte)result;
+            }
+            void ADC(byte b)
+            {
+                int result = cpu.registers.a + b;
+                cpu.registers.f.subtract = false;
+                SetFlagZ(result);
+                SetFlagH(cpu.registers.a, b);
+                SetFlagC(result);
+                cpu.registers.a = (byte)result;
+            }
+            void SUB(byte b)
+            {
+                int result = cpu.registers.a - b;
+                cpu.registers.f.subtract = true;
+                SetFlagZ(result);
+                SetFlagHSubstract(cpu.registers.a, b);
+                cpu.registers.f.subtract = true;
+                cpu.registers.a = (byte)result;
+            }
+            void SBC(byte b)
+            {
+                int result = cpu.registers.a - b - (cpu.registers.f.carry ? 1 : 0);
+                cpu.registers.f.subtract = true;
+                SetFlagZ(result);
+                SetFlagHSubstract(cpu.registers.a, b);
+                SetFlagC(b);
+                cpu.registers.a = (byte)result;
+            }
         }
     }
 }
