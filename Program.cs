@@ -375,13 +375,13 @@ namespace GBEmulator
                 case 0xFE: CP(cpu.ReadByte(true)); cpu.pc++; break;
 
                 //INC n
-                case 0x3C: cpu.registers.a = INC(cpu.registers.a ); cpu.pc++; break;
-                case 0x04: cpu.registers.b = INC(cpu.registers.b ); cpu.pc++; break;
-                case 0x0C: cpu.registers.c = INC(cpu.registers.c ); cpu.pc++; break;
-                case 0x14: cpu.registers.d = INC(cpu.registers.d ); cpu.pc++; break;
-                case 0x1C: cpu.registers.e = INC(cpu.registers.e ); cpu.pc++; break;
-                case 0x24: cpu.registers.h = INC(cpu.registers.h ); cpu.pc++; break;
-                case 0x2C: cpu.registers.l = INC(cpu.registers.l ); cpu.pc++; break;
+                case 0x3C: cpu.registers.a = INC(cpu.registers.a); cpu.pc++; break;
+                case 0x04: cpu.registers.b = INC(cpu.registers.b); cpu.pc++; break;
+                case 0x0C: cpu.registers.c = INC(cpu.registers.c); cpu.pc++; break;
+                case 0x14: cpu.registers.d = INC(cpu.registers.d); cpu.pc++; break;
+                case 0x1C: cpu.registers.e = INC(cpu.registers.e); cpu.pc++; break;
+                case 0x24: cpu.registers.h = INC(cpu.registers.h); cpu.pc++; break;
+                case 0x2C: cpu.registers.l = INC(cpu.registers.l); cpu.pc++; break;
                 case 0x34: cpu.WriteAt(cpu.registers.hl, INC(cpu.ReadAt(cpu.registers.hl))); cpu.pc++; break;
 
                 //DEC n
@@ -404,8 +404,21 @@ namespace GBEmulator
                 //ADD SP, n
                 case 0xE8: cpu.sp = ADDUShort(cpu.sp, cpu.ReadByte(true)); cpu.pc++; break;
 
+                //INC nn
+                case 0x03: cpu.registers.bc = (ushort)(cpu.registers.bc + 1); cpu.pc++; break;
+                case 0x13: cpu.registers.de = (ushort)(cpu.registers.de + 1); cpu.pc++; break;
+                case 0x23: cpu.registers.hl = (ushort)(cpu.registers.hl + 1); cpu.pc++; break;
+                case 0x33: cpu.sp =           (ushort)(cpu.sp           + 1); cpu.pc++; break;
 
+                //DEC nn
+                case 0x0B: cpu.registers.bc  = (ushort)(cpu.registers.bc - 1); cpu.pc++; break;
+                case 0x1B: cpu.registers.de  = (ushort)(cpu.registers.de - 1); cpu.pc++; break;
+                case 0x2B: cpu.registers.hl  = (ushort)(cpu.registers.hl - 1); cpu.pc++; break;
+                case 0x3B: cpu.sp            = (ushort)(cpu.sp           - 1); cpu.pc++; break;
 
+                //SWAP n
+                case 0xCB:
+                case 0x37:
 
                 default:
                     Console.WriteLine("undefined or empty opcode"); cpu.pc++;
