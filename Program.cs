@@ -463,8 +463,52 @@ namespace GBEmulator
 
                 //Rotates and Shifts
                 //RLCA
-                case 0x07: 
+                case 0x07:
+                    {
+                        cpu.registers.f.carry = cpu.registers.a >> 7 != 0;
+                        byte result = (byte)(cpu.registers.a << 1 | cpu.registers.a >> 7);
+                        SetFlagZ(result);
+                        cpu.registers.a = result;
+                        cpu.registers.f.subtract = false;
+                        cpu.registers.f.half_carry = false;
+                        cpu.pc++; break;
+                    }
 
+                //RLA
+                case 0x17:
+                    {
+                        bool carry = cpu.registers.f.carry;
+                        cpu.registers.f.carry = cpu.registers.a >> 7 != 0;
+                        cpu.registers.a = (byte)(cpu.registers.a | (carry ? 1 : 0));
+                        cpu.registers.f.subtract = false;
+                        cpu.registers.f.half_carry = false;
+                        cpu.pc++; break;
+                    }
+
+                //RRCA
+                case 0x0F:
+                    {
+                        cpu.registers.f.carry = cpu.registers.a << 7 != 0;
+                        byte result = (byte)(cpu.registers.a << 7 | cpu.registers.a >> 1);
+                        SetFlagZ(result);
+                        cpu.registers.a = result;
+                        cpu.registers.f.subtract = false;
+                        cpu.registers.f.half_carry = false;
+                        cpu.pc++; break;
+                    }
+
+                //RRA
+                case 0x1F:
+                    {
+                        bool carry = cpu.registers.f.carry;
+                        cpu.registers.f.carry = cpu.registers.a << 7 != 0;
+                        cpu.registers.a = (byte)(cpu.registers.a | (carry ? 1 : 0));
+                        cpu.registers.f.subtract = false;
+                        cpu.registers.f.half_carry = false;
+                        cpu.pc++; break;
+                    }
+
+                //RLC n
 
                 default:
                     Console.WriteLine("undefined or empty opcode"); cpu.pc++;
@@ -475,14 +519,74 @@ namespace GBEmulator
             {
                 switch (opcode)
                 {
-                    case 0x37:cpu.registers.a = SWAP(cpu.registers.a ); break;
-                    case 0x30:cpu.registers.b = SWAP(cpu.registers.b ); break;
-                    case 0x31:cpu.registers.c = SWAP(cpu.registers.c ); break;
-                    case 0x32:cpu.registers.d = SWAP(cpu.registers.d ); break;
-                    case 0x33:cpu.registers.e = SWAP(cpu.registers.e ); break;
-                    case 0x34:cpu.registers.h = SWAP(cpu.registers.h ); break;
-                    case 0x35:cpu.registers.l = SWAP(cpu.registers.l ); break;
-                    case 0x36:cpu.WriteAt(cpu.registers.hl, SWAP(cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0x37: cpu.registers.a = SWAP(cpu.registers.a); break;
+                    case 0x30: cpu.registers.b = SWAP(cpu.registers.b); break;
+                    case 0x31: cpu.registers.c = SWAP(cpu.registers.c); break;
+                    case 0x32: cpu.registers.d = SWAP(cpu.registers.d); break;
+                    case 0x33: cpu.registers.e = SWAP(cpu.registers.e); break;
+                    case 0x34: cpu.registers.h = SWAP(cpu.registers.h); break;
+                    case 0x35: cpu.registers.l = SWAP(cpu.registers.l); break;
+                    case 0x36: cpu.WriteAt(cpu.registers.hl, SWAP(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //RLC n
+                    case 0x07: cpu.registers.a = RLC(cpu.registers.a); break;
+                    case 0x00: cpu.registers.b = RLC(cpu.registers.b); break;
+                    case 0x01: cpu.registers.c = RLC(cpu.registers.c); break;
+                    case 0x02: cpu.registers.d = RLC(cpu.registers.d); break;
+                    case 0x03: cpu.registers.e = RLC(cpu.registers.e); break;
+                    case 0x04: cpu.registers.h = RLC(cpu.registers.h); break;
+                    case 0x05: cpu.registers.l = RLC(cpu.registers.l); break;
+                    case 0x06: cpu.WriteAt(cpu.registers.hl, RLC(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //RL n
+                    case 0x17: cpu.registers.a = RL(cpu.registers.a); break;
+                    case 0x10: cpu.registers.b = RL(cpu.registers.b); break;
+                    case 0x11: cpu.registers.c = RL(cpu.registers.c); break;
+                    case 0x12: cpu.registers.d = RL(cpu.registers.d); break;
+                    case 0x13: cpu.registers.e = RL(cpu.registers.e); break;
+                    case 0x14: cpu.registers.h = RL(cpu.registers.h); break;
+                    case 0x15: cpu.registers.l = RL(cpu.registers.l); break;
+                    case 0x16: cpu.WriteAt(cpu.registers.hl, RL(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //RRC n
+                    case 0x0F: cpu.registers.a = RRC(cpu.registers.a); break;
+                    case 0x08: cpu.registers.b = RRC(cpu.registers.b); break;
+                    case 0x09: cpu.registers.c = RRC(cpu.registers.c); break;
+                    case 0x0A: cpu.registers.d = RRC(cpu.registers.d); break;
+                    case 0x0B: cpu.registers.e = RRC(cpu.registers.e); break;
+                    case 0x0C: cpu.registers.h = RRC(cpu.registers.h); break;
+                    case 0x0D: cpu.registers.l = RRC(cpu.registers.l); break;
+                    case 0x0E: cpu.WriteAt(cpu.registers.hl, RRC(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //RR n
+                    case 0x1F: cpu.registers.a = RR(cpu.registers.a); break;
+                    case 0x18: cpu.registers.b = RR(cpu.registers.b); break;
+                    case 0x19: cpu.registers.c = RR(cpu.registers.c); break;
+                    case 0x1A: cpu.registers.d = RR(cpu.registers.d); break;
+                    case 0x1B: cpu.registers.e = RR(cpu.registers.e); break;
+                    case 0x1C: cpu.registers.h = RR(cpu.registers.h); break;
+                    case 0x1D: cpu.registers.l = RR(cpu.registers.l); break;
+                    case 0x1E: cpu.WriteAt(cpu.registers.hl, RR(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //SLA n
+                    case 0x27: cpu.registers.a = SLA(cpu.registers.a); break;
+                    case 0x20: cpu.registers.b = SLA(cpu.registers.b); break;
+                    case 0x21: cpu.registers.c = SLA(cpu.registers.c); break;
+                    case 0x22: cpu.registers.d = SLA(cpu.registers.d); break;
+                    case 0x23: cpu.registers.e = SLA(cpu.registers.e); break;
+                    case 0x24: cpu.registers.h = SLA(cpu.registers.h); break;
+                    case 0x25: cpu.registers.l = SLA(cpu.registers.l); break;
+                    case 0x26: cpu.WriteAt(cpu.registers.hl, SLA(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //SRA n
+                    case 0x2F: cpu.registers.a = SRA(cpu.registers.a); break;
+                    case 0x28: cpu.registers.b = SRA(cpu.registers.b); break;
+                    case 0x29: cpu.registers.c = SRA(cpu.registers.c); break;
+                    case 0x2A: cpu.registers.d = SRA(cpu.registers.d); break;
+                    case 0x2B: cpu.registers.e = SRA(cpu.registers.e); break;
+                    case 0x2C: cpu.registers.h = SRA(cpu.registers.h); break;
+                    case 0x2D: cpu.registers.l = SRA(cpu.registers.l); break;
+                    case 0x2E: cpu.WriteAt(cpu.registers.hl, SRA(cpu.ReadAt(cpu.registers.hl))); break;
                 }
             }
             static ushort Combine(byte a, byte b)
@@ -620,6 +724,62 @@ namespace GBEmulator
                 cpu.registers.f.carry = false;
                 cpu.registers.f.half_carry = false;
                 return (byte) result;
+            }
+            byte RLC(byte b)
+            {
+                int result = b << 1 | b >> 7;
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = b >> 7 != 0;
+                return (byte) result;
+            }
+            byte RL(byte b)
+            {
+                bool carry = cpu.registers.f.carry;
+                cpu.registers.f.carry = cpu.registers.a >> 7 != 0;
+                byte result = (byte)(cpu.registers.a | (carry ? 1 : 0));
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                return result;
+            }
+            byte RRC(byte b)
+            {
+                int result = b >> 1 | b << 7;
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = (b & 1) != 0;
+                return (byte)result;
+            }
+            byte RR(byte b)
+            {
+                bool carry = cpu.registers.f.carry;
+                cpu.registers.f.carry = (b & 1) != 0;
+                byte result = (byte)(cpu.registers.a | (carry ? 1 : 0) << 7);
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                return result;
+            }
+            byte SLA(byte b)
+            {
+                int result = b << 1;
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = b >> 7 != 0;
+                return (byte)result;
+            }
+            byte SRA(byte b)
+            {
+                int result = b >> 1;
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = (b & 1) != 0;
+                return (byte)result;
             }
 
 
