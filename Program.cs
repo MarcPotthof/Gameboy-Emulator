@@ -7,9 +7,8 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        byte num1 = byte.MaxValue;
-        byte num2 = 25;
-        Console.WriteLine(checked((byte)(num1 + num2)));
+        int binary = Convert.ToInt32("1001", 2);
+        Console.WriteLine(Convert.ToString(~binary & 0xF, 2));
     }
 }
 
@@ -416,13 +415,75 @@ namespace GBEmulator
                 case 0x2B: cpu.registers.hl  = (ushort)(cpu.registers.hl - 1); cpu.pc++; break;
                 case 0x3B: cpu.sp            = (ushort)(cpu.sp           - 1); cpu.pc++; break;
 
-                //SWAP n
-                case 0xCB:
-                case 0x37:
+                //Prefix opcodes
+                case 0xCB: PrefixOpcodes(cpu.ReadByte(true)); cpu.pc++; break;
+
+                //DAA
+                case 0x27: {
+                        if (cpu.registers.f.subtract)
+                        { // sub
+                            if (cpu.registers.f.carry) { cpu.registers.a -= 0x60; }
+                            if (cpu.registers.f.half_carry) { cpu.registers.a -= 0x6; }
+                        }
+                        else
+                        { // add
+                            if (cpu.registers.f.carry || (cpu.registers.a > 0x99)) { cpu.registers.a += 0x60; cpu.registers.f.carry = true; }
+                            if (cpu.registers.f.half_carry || (cpu.registers.a & 0xF) > 0x9) { cpu.registers.a += 0x6; }
+                        }
+                        SetFlagZ(cpu.registers.a);
+                        cpu.registers.f.half_carry = false;
+                    } cpu.pc++; break;
+
+                //CPL
+                case 0x2F: {
+                        cpu.registers.a = (byte)~cpu.registers.a;
+                        cpu.registers.f.subtract = true;
+                        cpu.registers.f.half_carry = true;
+                    } cpu.pc++; break;
+                    
+                //CCF
+                case 0x3F: cpu.registers.f.subtract = false; cpu.registers.f.half_carry = false; cpu.registers.f.carry = !cpu.registers.f.carry; cpu.pc++; break;
+
+                //SCF
+                case 0x37: cpu.registers.f.subtract = false; cpu.registers.f.half_carry = false; cpu.registers.f.carry = true; cpu.pc++; break;
+
+                //NOP
+                case 0x00: cpu.pc++; break;
+
+                //HALT
+                case 0x76: HALT(); break;
+
+                //STOP
+                case 0x10: STOP(); break;
+
+                //DI
+                case 0xF3: DisableInterrupt(); break;
+
+                case 0xFB: EnableInterrupt(); break;
+
+                //Rotates and Shifts
+                //RLCA
+                case 0x07: 
+
 
                 default:
                     Console.WriteLine("undefined or empty opcode"); cpu.pc++;
                     throw new NotImplementedException("the opcode was either not implemented of flawed");
+            }
+
+            void PrefixOpcodes(byte opcode)
+            {
+                switch (opcode)
+                {
+                    case 0x37:cpu.registers.a = SWAP(cpu.registers.a ); break;
+                    case 0x30:cpu.registers.b = SWAP(cpu.registers.b ); break;
+                    case 0x31:cpu.registers.c = SWAP(cpu.registers.c ); break;
+                    case 0x32:cpu.registers.d = SWAP(cpu.registers.d ); break;
+                    case 0x33:cpu.registers.e = SWAP(cpu.registers.e ); break;
+                    case 0x34:cpu.registers.h = SWAP(cpu.registers.h ); break;
+                    case 0x35:cpu.registers.l = SWAP(cpu.registers.l ); break;
+                    case 0x36:cpu.WriteAt(cpu.registers.hl, SWAP(cpu.ReadAt(cpu.registers.hl))); break;
+                }
             }
             static ushort Combine(byte a, byte b)
             {
@@ -550,6 +611,34 @@ namespace GBEmulator
                 SetFlagHSubstract(b, 1);
                 cpu.registers.f.subtract = true;
                 return result;
+            }
+            byte SWAP(byte b)
+            {
+                int result = (b >> 4 | b << 4);
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.carry = false;
+                cpu.registers.f.half_carry = false;
+                return (byte) result;
+            }
+
+
+
+            void HALT()
+            {
+                throw new NotImplementedException();
+            }
+            void STOP()
+            {
+                throw new NotImplementedException();
+            }
+            void DisableInterrupt()
+            {
+                throw new NotImplementedException();
+            }
+            void EnableInterrupt()
+            {
+                throw new NotImplementedException();
             }
         }
     }
