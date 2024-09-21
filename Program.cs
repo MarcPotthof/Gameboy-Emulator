@@ -508,8 +508,6 @@ namespace GBEmulator
                         cpu.pc++; break;
                     }
 
-                //RLC n
-
                 default:
                     Console.WriteLine("undefined or empty opcode"); cpu.pc++;
                     throw new NotImplementedException("the opcode was either not implemented of flawed");
@@ -587,6 +585,18 @@ namespace GBEmulator
                     case 0x2C: cpu.registers.h = SRA(cpu.registers.h); break;
                     case 0x2D: cpu.registers.l = SRA(cpu.registers.l); break;
                     case 0x2E: cpu.WriteAt(cpu.registers.hl, SRA(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //SRL n
+                    case 0x3F: cpu.registers.a = SRL(cpu.registers.a); break;
+                    case 0x38: cpu.registers.b = SRL(cpu.registers.b); break;
+                    case 0x39: cpu.registers.c = SRL(cpu.registers.c); break;
+                    case 0x3A: cpu.registers.d = SRL(cpu.registers.d); break;
+                    case 0x3B: cpu.registers.e = SRL(cpu.registers.e); break;
+                    case 0x3C: cpu.registers.h = SRL(cpu.registers.h); break;
+                    case 0x3D: cpu.registers.l = SRL(cpu.registers.l); break;
+                    case 0x3E: cpu.WriteAt(cpu.registers.hl, SRL(cpu.ReadAt(cpu.registers.hl))); break;
+
+                    //BIT b,r
                 }
             }
             static ushort Combine(byte a, byte b)
@@ -774,14 +784,28 @@ namespace GBEmulator
             }
             byte SRA(byte b)
             {
-                int result = b >> 1;
+                byte result = (byte)((b >> 1) | (b & 0x80));
                 SetFlagZ(result);
                 cpu.registers.f.subtract = false;
                 cpu.registers.f.half_carry = false;
-                cpu.registers.f.carry = (b & 1) != 0;
+                cpu.registers.f.carry = b >> 7 != 0;
                 return (byte)result;
             }
-
+            byte SRL(byte b)
+            {
+                byte result = (byte)(b >> 1);
+                SetFlagZ(result);
+                cpu.registers.f.subtract = false;
+                cpu.registers.f.half_carry = false;
+                cpu.registers.f.carry = b >> 7 != 0;
+                return (byte)result;
+            }
+            void BIT(byte bitmask, byte b)
+            {
+                cpu.registers.f.zero = (bitmask & b) == 0;
+                cpu.registers.f.half_carry = true;
+                cpu.registers.f.subtract = false;
+            }
 
 
             void HALT()
