@@ -597,6 +597,223 @@ namespace GBEmulator
                     case 0x3E: cpu.WriteAt(cpu.registers.hl, SRL(cpu.ReadAt(cpu.registers.hl))); break;
 
                     //BIT b,r
+                    case 0x40: BIT(0x01, cpu.registers.b); break;
+                    case 0x41: BIT(0x01, cpu.registers.c); break;
+                    case 0x42: BIT(0x01, cpu.registers.d); break;
+                    case 0x43: BIT(0x01, cpu.registers.e); break;
+                    case 0x44: BIT(0x01, cpu.registers.h); break;
+                    case 0x45: BIT(0x01, cpu.registers.l); break;
+                    case 0x46: BIT(0x01, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x47: BIT(0x01, cpu.registers.a); break;
+
+                    case 0x48: BIT(0x02, cpu.registers.b); break;
+                    case 0x49: BIT(0x02, cpu.registers.c); break;
+                    case 0x4A: BIT(0x02, cpu.registers.d); break;
+                    case 0x4B: BIT(0x02, cpu.registers.e); break;
+                    case 0x4C: BIT(0x02, cpu.registers.h); break;
+                    case 0x4D: BIT(0x02, cpu.registers.l); break;
+                    case 0x4E: BIT(0x02, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x4F: BIT(0x02, cpu.registers.a); break;
+
+                    case 0x50: BIT(0x04, cpu.registers.b); break;
+                    case 0x51: BIT(0x04, cpu.registers.c); break;
+                    case 0x52: BIT(0x04, cpu.registers.d); break;
+                    case 0x53: BIT(0x04, cpu.registers.e); break;
+                    case 0x54: BIT(0x04, cpu.registers.h); break;
+                    case 0x55: BIT(0x04, cpu.registers.l); break;
+                    case 0x56: BIT(0x04, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x57: BIT(0x04, cpu.registers.a); break;
+
+                    case 0x58: BIT(0x08, cpu.registers.b); break;
+                    case 0x59: BIT(0x08, cpu.registers.c); break;
+                    case 0x5A: BIT(0x08, cpu.registers.d); break;
+                    case 0x5B: BIT(0x08, cpu.registers.e); break;
+                    case 0x5C: BIT(0x08, cpu.registers.h); break;
+                    case 0x5D: BIT(0x08, cpu.registers.l); break;
+                    case 0x5E: BIT(0x08, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x5F: BIT(0x08, cpu.registers.a); break;
+
+                    case 0x60: BIT(0x10, cpu.registers.b); break;
+                    case 0x61: BIT(0x10, cpu.registers.c); break;
+                    case 0x62: BIT(0x10, cpu.registers.d); break;
+                    case 0x63: BIT(0x10, cpu.registers.e); break;
+                    case 0x64: BIT(0x10, cpu.registers.h); break;
+                    case 0x65: BIT(0x10, cpu.registers.l); break;
+                    case 0x66: BIT(0x10, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x67: BIT(0x10, cpu.registers.a); break;
+
+                    case 0x68: BIT(0x20, cpu.registers.b); break;
+                    case 0x69: BIT(0x20, cpu.registers.c); break;
+                    case 0x6A: BIT(0x20, cpu.registers.d); break;
+                    case 0x6B: BIT(0x20, cpu.registers.e); break;
+                    case 0x6C: BIT(0x20, cpu.registers.h); break;
+                    case 0x6D: BIT(0x20, cpu.registers.l); break;
+                    case 0x6E: BIT(0x20, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x6F: BIT(0x20, cpu.registers.a); break;
+
+                    case 0x70: BIT(0x40, cpu.registers.b); break;
+                    case 0x71: BIT(0x40, cpu.registers.c); break;
+                    case 0x72: BIT(0x40, cpu.registers.d); break;
+                    case 0x73: BIT(0x40, cpu.registers.e); break;
+                    case 0x74: BIT(0x40, cpu.registers.h); break;
+                    case 0x75: BIT(0x40, cpu.registers.l); break;
+                    case 0x76: BIT(0x40, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x77: BIT(0x40, cpu.registers.a); break;
+
+                    case 0x78: BIT(0x80, cpu.registers.b); break;
+                    case 0x79: BIT(0x80, cpu.registers.c); break;
+                    case 0x7A: BIT(0x80, cpu.registers.d); break;
+                    case 0x7B: BIT(0x80, cpu.registers.e); break;
+                    case 0x7C: BIT(0x80, cpu.registers.h); break;
+                    case 0x7D: BIT(0x80, cpu.registers.l); break;
+                    case 0x7E: BIT(0x80, cpu.ReadAt(cpu.registers.hl)); break;
+                    case 0x7F: BIT(0x80, cpu.registers.a); break;
+
+                    //SET b,r
+                    case 0xC0: cpu.registers.b = SET(0x01, cpu.registers.b); break;
+                    case 0xC1: cpu.registers.c = SET(0x01, cpu.registers.c); break;
+                    case 0xC2: cpu.registers.d = SET(0x01, cpu.registers.d); break;
+                    case 0xC3: cpu.registers.e = SET(0x01, cpu.registers.e); break;
+                    case 0xC4: cpu.registers.h = SET(0x01, cpu.registers.h); break;
+                    case 0xC5: cpu.registers.l = SET(0x01, cpu.registers.l); break;
+                    case 0xC6: cpu.WriteAt(cpu.registers.hl, SET(0x01, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xC7: cpu.registers.a = SET(0x01, cpu.registers.a); break;
+
+                    case 0xC8: cpu.registers.b = SET(0x02, cpu.registers.b); break;
+                    case 0xC9: cpu.registers.c = SET(0x02, cpu.registers.c); break;
+                    case 0xCA: cpu.registers.d = SET(0x02, cpu.registers.d); break;
+                    case 0xCB: cpu.registers.e = SET(0x02, cpu.registers.e); break;
+                    case 0xCC: cpu.registers.h = SET(0x02, cpu.registers.h); break;
+                    case 0xCD: cpu.registers.l = SET(0x02, cpu.registers.l); break;
+                    case 0xCE: cpu.WriteAt(cpu.registers.hl, SET(0x02, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xCF: cpu.registers.a = SET(0x02, cpu.registers.a); break;
+
+                    case 0xD0: cpu.registers.b = SET(0x04, cpu.registers.b); break;
+                    case 0xD1: cpu.registers.c = SET(0x04, cpu.registers.c); break;
+                    case 0xD2: cpu.registers.d = SET(0x04, cpu.registers.d); break;
+                    case 0xD3: cpu.registers.e = SET(0x04, cpu.registers.e); break;
+                    case 0xD4: cpu.registers.h = SET(0x04, cpu.registers.h); break;
+                    case 0xD5: cpu.registers.l = SET(0x04, cpu.registers.l); break;
+                    case 0xD6: cpu.WriteAt(cpu.registers.hl, SET(0x04, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xD7: cpu.registers.a = SET(0x04, cpu.registers.a); break;
+
+                    case 0xD8: cpu.registers.b = SET(0x08, cpu.registers.b); break;
+                    case 0xD9: cpu.registers.c = SET(0x08, cpu.registers.c); break;
+                    case 0xDA: cpu.registers.d = SET(0x08, cpu.registers.d); break;
+                    case 0xDB: cpu.registers.e = SET(0x08, cpu.registers.e); break;
+                    case 0xDC: cpu.registers.h = SET(0x08, cpu.registers.h); break;
+                    case 0xDD: cpu.registers.l = SET(0x08, cpu.registers.l); break;
+                    case 0xDE: cpu.WriteAt(cpu.registers.hl, SET(0x08, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xDF: cpu.registers.a = SET(0x08, cpu.registers.a); break;
+
+                    case 0xE0: cpu.registers.b = SET(0x10, cpu.registers.b); break;
+                    case 0xE1: cpu.registers.c = SET(0x10, cpu.registers.c); break;
+                    case 0xE2: cpu.registers.d = SET(0x10, cpu.registers.d); break;
+                    case 0xE3: cpu.registers.e = SET(0x10, cpu.registers.e); break;
+                    case 0xE4: cpu.registers.h = SET(0x10, cpu.registers.h); break;
+                    case 0xE5: cpu.registers.l = SET(0x10, cpu.registers.l); break;
+                    case 0xE6: cpu.WriteAt(cpu.registers.hl, SET(0x010, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xE7: cpu.registers.a = SET(0x10, cpu.registers.a); break;
+
+                    case 0xE8: cpu.registers.b = SET(0x20, cpu.registers.b); break;
+                    case 0xE9: cpu.registers.c = SET(0x20, cpu.registers.c); break;
+                    case 0xEA: cpu.registers.d = SET(0x20, cpu.registers.d); break;
+                    case 0xEB: cpu.registers.e = SET(0x20, cpu.registers.e); break;
+                    case 0xEC: cpu.registers.h = SET(0x20, cpu.registers.h); break;
+                    case 0xED: cpu.registers.l = SET(0x20, cpu.registers.l); break;
+                    case 0xEE: cpu.WriteAt(cpu.registers.hl, SET(0x20, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xEF: cpu.registers.a = SET(0x20, cpu.registers.a); break;
+
+                    case 0xF0: cpu.registers.b = SET(0x40, cpu.registers.b); break;
+                    case 0xF1: cpu.registers.c = SET(0x40, cpu.registers.c); break;
+                    case 0xF2: cpu.registers.d = SET(0x40, cpu.registers.d); break;
+                    case 0xF3: cpu.registers.e = SET(0x40, cpu.registers.e); break;
+                    case 0xF4: cpu.registers.h = SET(0x40, cpu.registers.h); break;
+                    case 0xF5: cpu.registers.l = SET(0x40, cpu.registers.l); break;
+                    case 0xF6: cpu.WriteAt(cpu.registers.hl, SET(0x40, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xF7: cpu.registers.a = SET(0x40, cpu.registers.a); break;
+
+                    case 0xF8: cpu.registers.b = SET(0x80, cpu.registers.b); break;
+                    case 0xF9: cpu.registers.c = SET(0x80, cpu.registers.c); break;
+                    case 0xFA: cpu.registers.d = SET(0x80, cpu.registers.d); break;
+                    case 0xFB: cpu.registers.e = SET(0x80, cpu.registers.e); break;
+                    case 0xFC: cpu.registers.h = SET(0x80, cpu.registers.h); break;
+                    case 0xFD: cpu.registers.l = SET(0x80, cpu.registers.l); break;
+                    case 0xFE: cpu.WriteAt(cpu.registers.hl, SET(0x80, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xFF: cpu.registers.a = SET(0x80, cpu.registers.a); break;
+
+                    //RES b,r
+                    case 0x80: cpu.registers.b = RES(0x01, cpu.registers.b); break;
+                    case 0x81: cpu.registers.c = RES(0x01, cpu.registers.c); break;
+                    case 0x82: cpu.registers.d = RES(0x01, cpu.registers.d); break;
+                    case 0x83: cpu.registers.e = RES(0x01, cpu.registers.e); break;
+                    case 0x84: cpu.registers.h = RES(0x01, cpu.registers.h); break;
+                    case 0x85: cpu.registers.l = RES(0x01, cpu.registers.l); break;
+                    case 0x86: cpu.WriteAt(cpu.registers.hl, RES(0x01, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0x87: cpu.registers.a = RES(0x01, cpu.registers.a); break;
+
+                    case 0x88: cpu.registers.b = RES(0x02, cpu.registers.b); break;
+                    case 0x89: cpu.registers.c = RES(0x02, cpu.registers.c); break;
+                    case 0x8A: cpu.registers.d = RES(0x02, cpu.registers.d); break;
+                    case 0x8B: cpu.registers.e = RES(0x02, cpu.registers.e); break;
+                    case 0x8C: cpu.registers.h = RES(0x02, cpu.registers.h); break;
+                    case 0x8D: cpu.registers.l = RES(0x02, cpu.registers.l); break;
+                    case 0x8E: cpu.WriteAt(cpu.registers.hl, RES(0x02, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0x8F: cpu.registers.a = RES(0x02, cpu.registers.a); break;
+
+                    case 0x90: cpu.registers.b = RES(0x04, cpu.registers.b); break;
+                    case 0x91: cpu.registers.c = RES(0x04, cpu.registers.c); break;
+                    case 0x92: cpu.registers.d = RES(0x04, cpu.registers.d); break;
+                    case 0x93: cpu.registers.e = RES(0x04, cpu.registers.e); break;
+                    case 0x94: cpu.registers.h = RES(0x04, cpu.registers.h); break;
+                    case 0x95: cpu.registers.l = RES(0x04, cpu.registers.l); break;
+                    case 0x96: cpu.WriteAt(cpu.registers.hl, RES(0x04, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0x97: cpu.registers.a = SET(0x04, cpu.registers.a); break;
+
+                    case 0x98: cpu.registers.b = SET(0x08, cpu.registers.b); break;
+                    case 0x99: cpu.registers.c = SET(0x08, cpu.registers.c); break;
+                    case 0x9A: cpu.registers.d = SET(0x08, cpu.registers.d); break;
+                    case 0x9B: cpu.registers.e = SET(0x08, cpu.registers.e); break;
+                    case 0x9C: cpu.registers.h = SET(0x08, cpu.registers.h); break;
+                    case 0x9D: cpu.registers.l = SET(0x08, cpu.registers.l); break;
+                    case 0x9E: cpu.WriteAt(cpu.registers.hl, SET(0x08, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0x9F: cpu.registers.a = SET(0x08, cpu.registers.a); break;
+
+                    case 0xA0: cpu.registers.b = SET(0x10, cpu.registers.b); break;
+                    case 0xA1: cpu.registers.c = SET(0x10, cpu.registers.c); break;
+                    case 0xA2: cpu.registers.d = SET(0x10, cpu.registers.d); break;
+                    case 0xA3: cpu.registers.e = SET(0x10, cpu.registers.e); break;
+                    case 0xA4: cpu.registers.h = SET(0x10, cpu.registers.h); break;
+                    case 0xA5: cpu.registers.l = SET(0x10, cpu.registers.l); break;
+                    case 0xA6: cpu.WriteAt(cpu.registers.hl, SET(0x010, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xA7: cpu.registers.a = SET(0x10, cpu.registers.a); break;
+
+                    case 0xA8: cpu.registers.b = SET(0x20, cpu.registers.b); break;
+                    case 0xA9: cpu.registers.c = SET(0x20, cpu.registers.c); break;
+                    case 0xAA: cpu.registers.d = SET(0x20, cpu.registers.d); break;
+                    case 0xAB: cpu.registers.e = SET(0x20, cpu.registers.e); break;
+                    case 0xAC: cpu.registers.h = SET(0x20, cpu.registers.h); break;
+                    case 0xAD: cpu.registers.l = SET(0x20, cpu.registers.l); break;
+                    case 0xAE: cpu.WriteAt(cpu.registers.hl, SET(0x20, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xAF: cpu.registers.a = SET(0x20, cpu.registers.a); break;
+
+                    case 0xB0: cpu.registers.b = SET(0x40, cpu.registers.b); break;
+                    case 0xB1: cpu.registers.c = SET(0x40, cpu.registers.c); break;
+                    case 0xB2: cpu.registers.d = SET(0x40, cpu.registers.d); break;
+                    case 0xB3: cpu.registers.e = SET(0x40, cpu.registers.e); break;
+                    case 0xB4: cpu.registers.h = SET(0x40, cpu.registers.h); break;
+                    case 0xB5: cpu.registers.l = SET(0x40, cpu.registers.l); break;
+                    case 0xB6: cpu.WriteAt(cpu.registers.hl, SET(0x40, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xB7: cpu.registers.a = SET(0x40, cpu.registers.a); break;
+
+                    case 0xB8: cpu.registers.b = SET(0x80, cpu.registers.b); break;
+                    case 0xB9: cpu.registers.c = SET(0x80, cpu.registers.c); break;
+                    case 0xBA: cpu.registers.d = SET(0x80, cpu.registers.d); break;
+                    case 0xBB: cpu.registers.e = SET(0x80, cpu.registers.e); break;
+                    case 0xBC: cpu.registers.h = SET(0x80, cpu.registers.h); break;
+                    case 0xBD: cpu.registers.l = SET(0x80, cpu.registers.l); break;
+                    case 0xBE: cpu.WriteAt(cpu.registers.hl, SET(0x80, cpu.ReadAt(cpu.registers.hl))); break;
+                    case 0xBF: cpu.registers.a = SET(0x80, cpu.registers.a); break;
                 }
             }
             static ushort Combine(byte a, byte b)
@@ -805,6 +1022,14 @@ namespace GBEmulator
                 cpu.registers.f.zero = (bitmask & b) == 0;
                 cpu.registers.f.half_carry = true;
                 cpu.registers.f.subtract = false;
+            }
+            byte SET(byte bitmask, byte b)
+            {
+                return (byte)(b | bitmask);
+            }
+            byte RES(byte bitmask, byte b)
+            {
+                return (byte)(b & ~bitmask);
             }
 
 
