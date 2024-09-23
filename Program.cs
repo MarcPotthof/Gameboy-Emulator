@@ -1,6 +1,7 @@
 ﻿
 
 using Microsoft.Win32;
+using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 
 internal class Program
@@ -508,9 +509,63 @@ namespace GBEmulator
                         cpu.pc++; break;
                     }
 
+                //Jumps
+                //JP nn
+                case 0xC3: JPif(true); break;
+
+                //JP cc,nn
+                case 0xC2: JPif(!cpu.registers.f.subtract); break;
+                case 0xCA: JPif(cpu.registers.f.zero); break;
+                case 0xD2: JPif(!cpu.registers.f.carry); break;
+                case 0xDA: JPif(cpu.registers.f.carry); break;
+
+                //JP (HL)
+                case 0xE9: cpu.pc = cpu.registers.hl; break;
+
+                //JR n
+                case 0x18: JRif(true); break;
+
+                //JR cc,n
+                case 0x20: JRif(!cpu.registers.f.subtract); break;
+                case 0x28: JRif(cpu.registers.f.zero); break;
+                case 0x30: JRif(!cpu.registers.f.carry); break;
+                case 0x38: JRif(cpu.registers.f.carry); break;
+
+                //Calls
+                //CALL nn
+                case 0xCD: CALLif(true);  break;
+
+                //CALL cc,nn
+                case 0xC4: CALLif(!cpu.registers.f.subtract); break;
+                case 0xCC: CALLif(cpu.registers.f.zero); break;
+                case 0xD4: CALLif(!cpu.registers.f.carry); break;
+                case 0xDC: CALLif(cpu.registers.f.carry); break;
+
+                //RST n
+                case 0xC7: RST(0x00); break;
+                case 0xCF: RST(0x08); break;
+                case 0xD7: RST(0x10); break;
+                case 0xDF: RST(0x18); break;
+                case 0xE7: RST(0x20); break;
+                case 0xEF: RST(0x20); break;
+                case 0xF7: RST(0x28); break;
+                case 0xFF: RST(0x38); break;
+
+                //Returns
+                //RET
+                case 0xC9: cpu.pc = Pop(); break;
+
+                //RET cc
+                case 0xC0: RETif(!cpu.registers.f.subtract); break;
+                case 0xC8: RETif(cpu.registers.f.zero); break;
+                case 0xD0: RETif(!cpu.registers.f.carry); break;
+                case 0xD8: RETif(cpu.registers.f.carry); break;
+
+                //RETI
+                case 0xD9: RETif(true); EnableInterrupt(); break;
+
                 default:
-                    Console.WriteLine("undefined or empty opcode"); cpu.pc++;
-                    throw new NotImplementedException("the opcode was either not implemented of flawed");
+                    Console.WriteLine($"undefined or empty opcode: {cpu.memory[cpu.pc]}"); cpu.pc++; break;
             }
 
             void PrefixOpcodes(byte opcode)
@@ -1030,6 +1085,28 @@ namespace GBEmulator
             byte RES(byte bitmask, byte b)
             {
                 return (byte)(b & ~bitmask);
+            }
+            void JPif(bool jump)
+            {
+                if (jump) cpu.pc = (ushort)(cpu.ReadByte(true) & cpu.ReadByte(true) << 8);
+                else cpu.pc++;
+            }
+            void JRif(bool jump)
+            {
+                if (jump) cpu.pc += cpu.ReadAt((ushort)(cpu.pc + 1));
+            }
+            void CALLif(bool call)
+            {
+                if (call) Push((byte)(cpu.pc + 1)); cpu.pc = cpu.ReadUshort(true);
+            }
+            void RST(byte n)
+            {
+                Push(cpu.pc);
+                cpu.pc = n;
+            }
+            void RETif(bool ret)
+            {
+                if (ret) cpu.pc = Pop();
             }
 
 
