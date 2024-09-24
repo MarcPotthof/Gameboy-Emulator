@@ -102,6 +102,7 @@ namespace GBEmulator
     }
     public struct CPU
     {
+        public bool Halted {  get; set; }
         public Register registers;
 
         //program counter
@@ -111,7 +112,10 @@ namespace GBEmulator
         //stack pointer
         public ushort sp = 0xFFFE;
 
-        public CPU() { }
+        public CPU() 
+        {
+            Halted = false;
+        }
     }
     public static class Instructions
     {
@@ -146,6 +150,7 @@ namespace GBEmulator
 
         public static void ExecuteInstruction(this CPU cpu)
         {
+            if (cpu.Halted) return;
             switch (cpu.memory[cpu.pc])
             {
                 //Instruction list:
@@ -452,10 +457,10 @@ namespace GBEmulator
                 case 0x00: cpu.pc++; break;
 
                 //HALT
-                case 0x76: HALT(); break;
+                case 0x76: HALT(); cpu.pc++; break;
 
                 //STOP
-                case 0x10: STOP(); break;
+                case 0x10: STOP(); cpu.pc++;  break;
 
                 //DI
                 case 0xF3: DisableInterrupt(); break;
@@ -1112,9 +1117,14 @@ namespace GBEmulator
 
             void HALT()
             {
-                throw new NotImplementedException();
+                cpu.Halted = true;
+                return;
             }
             void STOP()
+            {
+                throw new NotImplementedException();
+            }
+            void Interrupt()
             {
                 throw new NotImplementedException();
             }
