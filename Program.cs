@@ -15,22 +15,6 @@ internal class Program
 
 namespace GBEmulator
 {
-    public struct Register
-    {
-        public byte a;
-        public byte b;
-        public byte c;
-        public byte d;
-        public byte e;
-        public FlagRegister f;
-        public byte h;
-        public byte l;
-
-        public ushort af { get { return (UInt16)((a << 8) | f.As_byte()); } set { a = (byte)((value & 0xff00) >> 8); f.From_byte((byte)(value & 0xff)); } }
-        public ushort bc { get { return (UInt16)((b << 8) | c); } set { b = (byte)((value & 0xff00) >> 8); c = (byte)(value & 0xff); } }
-        public ushort de { get { return (UInt16)((d << 8) | e); } set { d = (byte)((value & 0xff00) >> 8); e = (byte)(value & 0xff); } }
-        public ushort hl { get { return (UInt16)((h << 8) | l); } set { h = (byte)((value & 0xff00) >> 8); l = (byte)(value & 0xff); } }
-    }
     public struct FlagRegister
     {
         public const byte zero_flag_position = 7;
@@ -108,7 +92,7 @@ namespace GBEmulator
         //program counter
         public ushort pc = 0x100;
         //program memory
-        public byte[] memory = new byte[0xFFFF];
+        public Memory memory = new Memory(); 
         //stack pointer
         public ushort sp = 0xFFFE;
 
@@ -148,9 +132,9 @@ namespace GBEmulator
             cpu.memory[index + 1] = (byte)(value & 0xFF);
         }
 
-        public static void ExecuteInstruction(this CPU cpu)
+        public static int ExecuteInstruction(this CPU cpu)
         {
-            if (cpu.Halted) return;
+            if (cpu.Halted) return 0;
             switch (cpu.memory[cpu.pc])
             {
                 //Instruction list:
