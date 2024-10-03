@@ -6,7 +6,12 @@ namespace GBEmulator
     {
         public static readonly int Jump_True = 12;
         public static readonly int Jump_False = 8;
-        public static readonly int Return_True = 
+        public static readonly int Return_True = 20;
+        public static readonly int Return_False = 8;
+        public static readonly int Call_True = 24;
+        public static readonly int Call_False = 12;
+        public static readonly int Jump_To_True = 16;
+        public static readonly int Jump_To_False = 12;
 
         public static readonly int[] tCycles =
         {
@@ -33,6 +38,7 @@ namespace GBEmulator
               12, 12, 8 , 00, 00, 16, 8 , 16, 16, 4 , 16, 00, 00, 00, 8 , 16, //E
               12, 12, 8 , 4 , 00, 16, 8 , 16, 12, 8 , 16, 4 , 00, 00, 8 , 16, //F
         };
+
         public static readonly int[] prefixCycles =
         {
             //0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F

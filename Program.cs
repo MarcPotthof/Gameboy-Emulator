@@ -2,6 +2,7 @@
 
 using Microsoft.Win32;
 using System.ComponentModel.Design;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
 internal class Program
@@ -135,11 +136,10 @@ namespace GBEmulator
         public static int ExecuteInstruction(this CPU cpu)
         {
             if (cpu.Halted) return 0;
+            int cycles = 0;
+            cycles += Cycles.tCycles[cpu.memory[cpu.pc]];
             switch (cpu.memory[cpu.pc])
             {
-                //Instruction list:
-                //http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
-
                 //8-Bit Loads
 
                 //LD nn,n
@@ -149,6 +149,7 @@ namespace GBEmulator
                 case 0x1E: cpu.registers.e = cpu.ReadByte(true); cpu.pc++; break;
                 case 0x26: cpu.registers.h = cpu.ReadByte(true); cpu.pc++; break;
                 case 0x2E: cpu.registers.l = cpu.ReadByte(true); cpu.pc++; break;
+
                 //LD r1,r2
                 case 0x7F: cpu.registers.a = cpu.registers.a; cpu.pc++; break;
                 case 0x78: cpu.registers.a = cpu.registers.b; cpu.pc++; break;
@@ -556,6 +557,7 @@ namespace GBEmulator
                 default:
                     Console.WriteLine($"undefined or empty opcode: {cpu.memory[cpu.pc]}"); cpu.pc++; break;
             }
+            return cycles;
 
             void PrefixOpcodes(byte opcode)
             {
@@ -860,6 +862,7 @@ namespace GBEmulator
                     case 0xBF: cpu.registers.a = SET(0x80, cpu.registers.a); break;
                 }
             }
+
             static ushort Combine(byte a, byte b)
             {
                 return (ushort)((a << 8) | b);
@@ -1077,16 +1080,18 @@ namespace GBEmulator
             }
             void JPif(bool jump)
             {
-                if (jump) cpu.pc = (ushort)(cpu.ReadByte(true) & cpu.ReadByte(true) << 8);
-                else cpu.pc++;
+                if (jump) { cpu.pc = (ushort)(cpu.ReadByte(true) & cpu.ReadByte(true) << 8); cycles += Cycles.Jump_To_True; }
+                else { cpu.pc++; cycles += Cycles.Jump_To_False; }
             }
             void JRif(bool jump)
             {
-                if (jump) cpu.pc += cpu.ReadAt((ushort)(cpu.pc + 1));
+                if (jump) { cpu.pc += cpu.ReadAt((ushort)(cpu.pc + 1)); cycles += Cycles.Jump_True; }
+                else cycles += Cycles.Jump_False;
             }
             void CALLif(bool call)
             {
-                if (call) Push((byte)(cpu.pc + 1)); cpu.pc = cpu.ReadUshort(true);
+                if (call) { Push((byte)(cpu.pc + 1)); cpu.pc = cpu.ReadUshort(true); cycles += Cycles.Call_True; }
+                else cycles += Cycles.Call_False;
             }
             void RST(byte n)
             {
@@ -1095,7 +1100,11 @@ namespace GBEmulator
             }
             void RETif(bool ret)
             {
-                if (ret) cpu.pc = Pop();
+                if (ret) { cpu.pc = Pop(); cycles += Cycles.Return_True; }
+                else
+                {
+                     cycles += Cycles.Return_False;
+                }
             }
 
 
