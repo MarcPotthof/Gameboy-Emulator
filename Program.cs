@@ -16,75 +16,6 @@ internal class Program
 
 namespace GBEmulator
 {
-    public struct FlagRegister
-    {
-        public const byte zero_flag_position = 7;
-        public const byte subtract_flag_position = 6;
-        public const byte half_carry_flag_position = 5;
-        public const byte carry_flag_position = 4;
-
-        public bool zero;
-        public bool subtract;
-        public bool half_carry;
-        public bool carry;
-    }
-    public static class RegisterExtensions
-    {
-        //Enabling the Flagsregister to be used as a byte
-        public static byte As_byte(this FlagRegister flags)
-        {
-            return (byte)((flags.zero ? 1 : 0 << FlagRegister.zero_flag_position) |
-                          (flags.subtract ? 1 : 0 << FlagRegister.subtract_flag_position) |
-                          (flags.half_carry ? 1 : 0 << FlagRegister.half_carry_flag_position) |
-                          (flags.carry ? 1 : 0 << FlagRegister.carry_flag_position));
-        }
-        public static void From_byte(this FlagRegister flags, byte value)
-        {
-            flags.zero = (value >> FlagRegister.zero_flag_position & 0x1) == 1;
-            flags.subtract = (value >> FlagRegister.subtract_flag_position & 0x1) == 1;
-            flags.half_carry = (value >> FlagRegister.half_carry_flag_position & 0x1) == 1;
-            flags.carry = (value >> FlagRegister.carry_flag_position & 0x1) == 1;
-        }
-
-        //virtual registers: treat 2 seperate 8 bit registers as one 16 bit
-        public static UInt16 Get_af(this Register register)
-        {
-            return (UInt16)((register.a << 8) | register.f.As_byte());
-        }
-        public static UInt16 Get_bc(this Register register)
-        {
-            return (UInt16)((register.b << 8) | register.c);
-        }
-        public static UInt16 Get_de(this Register register)
-        {
-            return (UInt16)((register.d << 8) | register.e);
-        }
-        public static UInt16 Get_hl(this Register register)
-        {
-            return (UInt16)((register.h << 8) | register.l);
-        }
-
-        public static void Set_af(this Register register, UInt16 value)
-        {
-            register.a = (byte)((value & 0xff00) >> 8);
-            register.f.From_byte((byte)(value & 0xff));
-        }
-        public static void Set_bc(this Register register, UInt16 value)
-        {
-            register.b = (byte)((value & 0xff00) >> 8);
-            register.c = (byte)(value & 0xff);
-        }
-        public static void Set_de(this Register register, UInt16 value)
-        {
-            register.d = (byte)((value & 0xff00) >> 8);
-            register.e = (byte)(value & 0xff);
-        }
-        public static void Set_hl(this Register register, UInt16 value)
-        {
-            register.h = (byte)((value & 0xff00) >> 8);
-            register.l = (byte)(value & 0xff);
-        }
-    }
     public struct CPU
     {
         public bool Halted {  get; set; }
@@ -1130,5 +1061,67 @@ namespace GBEmulator
                 throw new NotImplementedException();
             }
         }
+    }
+     
+    static class Cycles
+    {
+        public static readonly int Jump_True = 12;
+        public static readonly int Jump_False = 8;
+        public static readonly int Return_True = 20;
+        public static readonly int Return_False = 8;
+        public static readonly int Call_True = 24;
+        public static readonly int Call_False = 12;
+        public static readonly int Jump_To_True = 16;
+        public static readonly int Jump_To_False = 12;
+
+        public static readonly int[] tCycles =
+        {
+            //0 values are conditional and listed above,
+            //00 values are unused codes
+            //0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , A , B , C , D , E , F
+              4 , 12, 8 , 8 , 4 , 4 , 8 , 4 , 20, 8 , 8 , 8 , 4 , 4 , 8 , 4 , //0
+	          4 , 12, 8 , 8 , 4 , 4 , 8 , 4 , 0 , 8 , 8 , 8 , 4 , 4 , 8 , 4 , //1
+              0 , 12, 8 , 8 , 4 , 4 , 8 , 4 , 0 , 8 , 8 , 8 , 4 , 4 , 8 , 4 , //2
+              0 , 12, 8 , 8 , 12, 12, 12, 4 , 0 , 8 , 8 , 8 , 4 , 4 , 8 , 4 , //3 
+
+              4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //4
+	          4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //5
+              4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //6
+              8 , 8 , 8 , 8 , 8 , 8 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //7
+ 
+              4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //8
+	          4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //9
+              4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //A
+              4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 8 , 4 , //B
+
+              0 , 12, 0 , 0 , 0 , 16, 8 , 16, 0 , 4 , 0 , 0 , 0 , 0 , 8 , 16, //C
+	          0 , 12, 0 , 00, 0 , 16, 8 , 16, 0 , 4 , 0 , 00, 0 , 00, 8 , 16, //D
+              12, 12, 8 , 00, 00, 16, 8 , 16, 16, 4 , 16, 00, 00, 00, 8 , 16, //E
+              12, 12, 8 , 4 , 00, 16, 8 , 16, 12, 8 , 16, 4 , 00, 00, 8 , 16, //F
+        };
+
+        public static readonly int[] prefixCycles =
+        {
+            //0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
+	          8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //0
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //1
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //2
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //3
+                                                   
+              8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , //4
+              8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , //5
+              8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , //6
+              8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 12, 8 , //7
+                                                   
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //8
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //9
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //A
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //B
+                                                  
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //C
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //D
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //E
+              8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //F
+        };
     }
 }
