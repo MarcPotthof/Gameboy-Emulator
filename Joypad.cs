@@ -1,0 +1,7 @@
+﻿namespace GBEmulator
+{
+    class Joypad
+    {
+        
+    }
+}

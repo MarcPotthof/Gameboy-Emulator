@@ -2,7 +2,7 @@
 {
     public static class PPU
     {
-        public void update()
+        public static void update()
         {
 
         }

@@ -30,6 +30,7 @@
     }
     public class Memory
     {
+        CPU cpu {  get; set; }
         byte[] memory = new byte[0xFFFF];
 
         //Timer registers
@@ -37,9 +38,13 @@
         public byte TIMA { get { return memory[0xFF05]; } set { memory[0xFF05] = value; } } //TIMA: Timer counter
         public byte TMA  { get { return memory[0xFF06]; } set { memory[0xFF06] = value; } } //TMA: Timer modulo
         public byte TAC  { get { return memory[0xFF07]; } set { memory[0xFF07] = value; } } //TAC TImer control
+
         //Interrupt registers
-        public byte IME  { get return};
+        public bool IME  { get;                           set;                            } //IME: Interrupt Master Enable
+        public byte IE   { get { return memory[0xFFFF]; } set { memory[0xFF0F] = value; } } //IF: Interrupt Enable
         public byte IF   { get { return memory[0xFF0F]; } set { memory[0xFF0F] = value; } } //IF: Interrupt Flag
+        public byte JOYP { get { return memory[0xFF00]; } set { memory[0xFF00] = value; } } //JOYP: Joypad
+
 
         public byte[] ROMBank00 { get { return memory.Take(0x4000).ToArray();  } set { memory = value.Concat(memory.Skip(0x4000)).ToArray(); } } //From cartridge, fixed bank
         public byte[] ROMBank01 { get { return memory.Skip(0x4000).Take(0x4000).ToArray(); } set { memory = memory.Take(0x4000).Concat(value).Concat(memory.Skip(0x8000)).ToArray(); } } //from cartridge, switchable bank
@@ -54,7 +59,10 @@
         }
         public void CallInterrupt(Interrupt interrupt)
         {
-            if ()
+            if (!IME) return;
+            if (!Utils.GetBit(IE, (byte)interrupt)) return;
+
+            IF = Utils.ResetBit(IF, (byte)interrupt);
             switch (interrupt)
             {
                 case Interrupt.VBlank: break;
@@ -63,12 +71,21 @@
                 case Interrupt.Serial: break;
                 case Interrupt.Joypad: break;
             }
+
+        }
+        public void RequestInterrupt(Interrupt interrupt)
+        {
+            IF = Utils.SetBit(IF, (int)interrupt);
         }
 
         public byte this[int i]
         {
             get { return memory[i]; }
             set { memory[i] = value; }
+        }
+        public Memory(CPU _cpu)
+        {
+            cpu = _cpu;
         }
     }
     public static class RegisterExtensions
