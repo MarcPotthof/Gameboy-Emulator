@@ -8,9 +8,25 @@ using System.Runtime.CompilerServices;
 
 internal class Program
 {
+    static CPU cpu = new CPU();
+    static Memory memory = new Memory(cpu);
+    static Joypad joypad = new Joypad();
+    static PPU ppu = new PPU();
+    static GBEmulator.Timer timer = new GBEmulator.Timer();
+
     private static void Main(string[] args)
     {
-        byte number = 0b00000001;
-        Console.WriteLine(Utils.GetBit(number, 1));
+        bool powerSwitch = true;
+        
+
+        int cpuCycles = 0;
+
+        while (powerSwitch)
+        {
+            int cycles = cpu.ExecuteNext();
+            cpuCycles += cycles;
+
+            
+        }
     }
 }

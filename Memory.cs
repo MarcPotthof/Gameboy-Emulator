@@ -30,14 +30,14 @@
     }
     public class Memory
     {
-        CPU cpu {  get; set; }
+        public CPU cpu;
         byte[] memory = new byte[0xFFFF];
 
         //Timer registers
         public byte DIV  { get { return memory[0xFF04]; } set { memory[0xFF04] = value; } } //DIV: Divider register
         public byte TIMA { get { return memory[0xFF05]; } set { memory[0xFF05] = value; } } //TIMA: Timer counter
         public byte TMA  { get { return memory[0xFF06]; } set { memory[0xFF06] = value; } } //TMA: Timer modulo
-        public byte TAC  { get { return memory[0xFF07]; } set { memory[0xFF07] = value; } } //TAC TImer control
+        public byte TAC  { get { return memory[0xFF07]; } set { memory[0xFF07] = value; } } //TAC Timer control
 
         //Interrupt registers
         public bool IME  { get;                           set;                            } //IME: Interrupt Master Enable
@@ -65,11 +65,11 @@
             IF = Utils.ResetBit(IF, (byte)interrupt);
             switch (interrupt)
             {
-                case Interrupt.VBlank: break;
-                case Interrupt.STAT: break;
-                case Interrupt.Timer: break;
-                case Interrupt.Serial: break;
-                case Interrupt.Joypad: break;
+                case Interrupt.VBlank: cpu.WriteShortAt(--cpu.sp, cpu.pc); cpu.pc = 0x0040; break;
+                case Interrupt.STAT: cpu.WriteShortAt(--cpu.sp, cpu.pc); cpu.pc = 0x0048; break;
+                case Interrupt.Timer: cpu.WriteShortAt(--cpu.sp, cpu.pc); cpu.pc = 0x0050; break;
+                case Interrupt.Serial: cpu.WriteShortAt(--cpu.sp, cpu.pc); cpu.pc = 0x0058; break;
+                case Interrupt.Joypad: cpu.WriteShortAt(--cpu.sp, cpu.pc); cpu.pc = 0x0060; break;
             }
 
         }

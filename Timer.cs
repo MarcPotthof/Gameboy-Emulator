@@ -2,6 +2,10 @@
 {
     public class Timer
     {
+        public const float FREQUENCY = 4.194304f * 1000000; //4 MHz frequency
+        public const float REFRESH_RATE = 59.727500569606f; //59 frames per second
+        public const float CYCLES_PER_REFRESH = FREQUENCY / REFRESH_RATE;
+
         private readonly int[] clockSelect =
         {
             1024, //00 Increment every 256 MCycles

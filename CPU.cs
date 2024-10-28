@@ -50,13 +50,16 @@
             cpu.memory[index] = (byte)(value >> 8);
             cpu.memory[index + 1] = (byte)(value & 0xFF);
         }
-
-        public static int ExecuteInstruction(this CPU cpu)
+        public static int ExecuteNext(this CPU cpu)
+        {
+            return cpu.Execute(cpu.ReadByte());
+        }
+        public static int Execute(this CPU cpu, byte opcode)
         {
             if (cpu.Halted) return 0;
             int cycles = 0;
-            cycles += Cycles.tCycles[cpu.memory[cpu.pc]];
-            switch (cpu.memory[cpu.pc])
+            cycles += Cycles.tCycles[opcode];
+            switch (opcode)
             {
                 //8-Bit Loads
 
@@ -1113,5 +1116,5 @@
               8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //E
               8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , 8 , 8 , 8 , 8 , 8 , 8 , 16, 8 , //F
         };
-    }
+    } 
 }

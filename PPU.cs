@@ -1,8 +1,8 @@
 ﻿namespace GBEmulator
 {
-    public static class PPU
+    public class PPU
     {
-        public static void update()
+        public void update()
         {
 
         }
