@@ -18,15 +18,23 @@ internal class Program
     {
         bool powerSwitch = true;
         
-
         int cpuCycles = 0;
 
         while (powerSwitch)
         {
-            int cycles = cpu.ExecuteNext();
-            cpuCycles += cycles;
-
-            
+            while (cpuCycles < GBEmulator.Timer.CYCLES_PER_REFRESH)
+            {
+                int cycles = cpu.ExecuteNext();
+                cpuCycles += cycles;
+                ppu.update();
+                timer.update(cycles, memory);
+               
+                for (int i = 0; i < 5; i++)
+                {
+                    memory.CallInterrupt((Memory.Interrupt)i);
+                }
+            }
+            cpuCycles = 0;
         }
     }
 }
