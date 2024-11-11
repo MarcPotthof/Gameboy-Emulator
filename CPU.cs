@@ -5,6 +5,7 @@
         public bool Halted {  get; set; }
         public Register registers;
 
+        Main baseclass;
         //program counter
         public ushort pc = 0x100;
         //program memory
@@ -12,11 +13,12 @@
         //stack pointer
         public ushort sp = 0xFFFE;
 
-        public CPU() 
+        public CPU(Main main) 
         {
+            this.baseclass = main;
+            memory = baseclass.memory;
             Halted = false;
             registers = new Register();
-            memory = new Memory(this);
         }
     }
 

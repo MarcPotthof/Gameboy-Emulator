@@ -14,5 +14,9 @@
         {
             return (byte)(number !& (1 << bit));
         }
+        public static byte SetBitState(byte number, int bit, bool state)
+        {
+            return state ? SetBit(number, bit) : SetBit(number, bit);
+        }
     }
 }

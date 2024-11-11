@@ -31,6 +31,7 @@
     public class Memory
     {
         public CPU cpu;
+        public Joypad joypad;
         byte[] memory = new byte[0xFFFF];
 
         //Timer registers
@@ -43,7 +44,7 @@
         public bool IME  { get;                           set;                            } //IME: Interrupt Master Enable
         public byte IE   { get { return memory[0xFFFF]; } set { memory[0xFF0F] = value; } } //IF: Interrupt Enable
         public byte IF   { get { return memory[0xFF0F]; } set { memory[0xFF0F] = value; } } //IF: Interrupt Flag
-        public byte JOYP { get { return memory[0xFF00]; } set { memory[0xFF00] = value; } } //JOYP: Joypad
+        public byte JOYP { get { return joypad.JoypadToRegister(memory[0xFF00]); } set { memory[0xFF00] = (byte)((value >> 4) << 4); } } //JOYP: Joypad
 
 
         public byte[] ROMBank00 { get { return memory.Take(0x4000).ToArray();  } set { memory = value.Concat(memory.Skip(0x4000)).ToArray(); } } //From cartridge, fixed bank
@@ -83,9 +84,10 @@
             get { return memory[i]; }
             set { memory[i] = value; }
         }
-        public Memory(CPU _cpu)
+        public Memory(CPU _cpu, Joypad _joypad)
         {
             cpu = _cpu;
+            joypad = _joypad;
         }
     }
     public static class RegisterExtensions
