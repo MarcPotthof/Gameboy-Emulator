@@ -32,5 +32,19 @@ namespace GBEmulator
             else data = 0x3f;
             return data;
         }
+        public void SetControl(int index, bool state)
+        {
+            switch (index)
+            {
+                case 0: left = state; break;
+                case 1: up = state; break;
+                case 2: right = state; break;
+                case 3: down = state; break;
+                case 4: a = state; break;
+                case 5: b = state; break;
+                case 6: select = state; break;
+                case 7: start = state; break;
+            }
+        }
     }
 }

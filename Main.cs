@@ -10,10 +10,11 @@ namespace GBEmulator
         public PPU ppu;
         public GBEmulator.Timer timer;
 
-        private void Loop()
+        public void Start()
         {
             bool powerSwitch = true;
 
+            //main loop
             int cpuCycles = 0;
 
             while (powerSwitch)
