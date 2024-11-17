@@ -21,11 +21,26 @@
         {
             Memory memory = baseclass.memory;
 
-            divCycles = cycles;
+            divCycles += cycles;
             while (divCycles >= 256)
             {
                 memory.DIV++;
                 divCycles -= 256;
+            }
+
+            TIMACycles += cycles;
+            if (memory.TAC < 4)
+            {
+                while (TIMACycles >= clockSelect[memory.TAC])
+                {
+                    TIMACycles -= clockSelect[memory.TAC];
+                    if (memory.TIMA >= byte.MaxValue)
+                    {
+                        memory.TIMA = memory.TMA;
+                        memory.CallInterrupt(Memory.Interrupt.Timer);
+                    }
+                    else memory.TIMA++;
+                }
             }
         }
     }
